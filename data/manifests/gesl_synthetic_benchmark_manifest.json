@@ -1,0 +1,42 @@
+{
+  "dataset_name": "gesl_synthetic_benchmark.csv",
+  "dataset_version": "1.0.0",
+  "source": "synthetic_gesl_compatible",
+  "created_at": "2026-11-17T04:25:17.778720+00:00",
+  "description": "Reproducible multi-class power system disturbance benchmark",
+  "checksum_sha256": "839b0da6dcb4222094205434b54f449ef7ae7bcd808f462610bd37ddd450ccb1",
+  "total_records": 90,
+  "sampling_rate": 30.0,
+  "nominal_frequency": 60.0,
+  "split_strategy": "event_grouped_by_event_id",
+  "partitions": {
+    "train": {
+      "num_records": 55,
+      "class_distribution": {
+        "frequency_excursion": 15,
+        "forced_oscillation": 10,
+        "damped_ringdown": 10,
+        "poorly_damped": 10,
+        "overlapping_events": 10
+      }
+    },
+    "validation": {
+      "num_records": 15,
+      "class_distribution": {
+        "baseline_noise": 5,
+        "poorly_damped": 5,
+        "overlapping_events": 5
+      }
+    },
+    "test": {
+      "num_records": 20,
+      "class_distribution": {
+        "baseline_noise": 10,
+        "forced_oscillation": 5,
+        "damped_ringdown": 5
+      }
+    }
+  },
+  "preprocessing_applied": {},
+  "metadata": {}
+}
