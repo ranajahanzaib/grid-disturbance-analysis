@@ -1,0 +1,73 @@
+# Machine Learning Training Configurations
+
+experiment:
+  name: "grid_disturbance_benchmark"
+  random_seed: 42
+  test_size: 0.20
+  val_size: 0.15
+  split_strategy: "event_grouped" # "event_grouped" to avoid leakage or "stratified"
+  target_column: "disturbance_type"
+  classes:
+    - "baseline_noise"
+    - "forced_oscillation"
+    - "damped_ringdown"
+    - "poorly_damped"
+    - "frequency_excursion"
+    - "overlapping_events"
+
+classical:
+  models:
+    - "random_forest"
+    - "extra_trees"
+    - "gradient_boosting"
+    - "logistic_regression"
+  hyperparameters:
+    random_forest:
+      n_estimators: 200
+      max_depth: 12
+      class_weight: "balanced"
+      random_state: 42
+    extra_trees:
+      n_estimators: 200
+      max_depth: 12
+      class_weight: "balanced"
+      random_state: 42
+    gradient_boosting:
+      n_estimators: 150
+      learning_rate: 0.08
+      max_depth: 5
+      random_state: 42
+    logistic_regression:
+      max_iter: 1000
+      class_weight: "balanced"
+      C: 1.0
+
+temporal_cnn:
+  input_length: 600 # 20 seconds @ 30 Hz
+  in_channels: 1
+  channels: [32, 64, 128, 256]
+  kernel_sizes: [7, 5, 3, 3]
+  pool_sizes: [2, 2, 2, 2]
+  dropout: 0.30
+  batch_size: 32
+  learning_rate: 0.001
+  epochs: 25
+  weight_decay: 0.0001
+  patience: 6
+
+spectrogram_cnn:
+  image_size: [64, 64]
+  in_channels: 1
+  channels: [32, 64, 128]
+  kernel_size: 3
+  dropout: 0.30
+  batch_size: 32
+  learning_rate: 0.001
+  epochs: 25
+  weight_decay: 0.0001
+  patience: 6
+
+clustering:
+  n_clusters: 5
+  methods: ["kmeans", "pca", "isolation_forest"]
+  pca_components: 2

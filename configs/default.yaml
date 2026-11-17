@@ -1,0 +1,57 @@
+system:
+  project_name: "grid-disturbance-analysis"
+  version: "0.1.0"
+  random_seed: 42
+  log_level: "INFO"
+  device: "auto" # "auto", "cpu", "cuda", "mps"
+  cache_dir: ".cache"
+  database_path: "data/storage.db"
+
+signal:
+  nominal_frequency: 60.0 # Hz (North American standard) or 50.0 Hz
+  default_sampling_rate: 30.0 # Hz (typical PMU synchrophasor reporting rate: 30 or 60 fps)
+  nyquist_fraction: 0.95
+  oscillation_bands:
+    inter_area: [0.1, 1.0] # Hz (inter-area electromechanical modes)
+    local_plant: [1.0, 2.0] # Hz (local generator/plant modes)
+    control_torsional: [2.0, 10.0] # Hz (control/sub-synchronous interactions)
+
+preprocessing:
+  detrend: "linear" # "linear", "constant", or "none"
+  remove_dc: true
+  normalization: "standardize" # "standardize", "robust", "minmax", "none"
+  filter:
+    enabled: true
+    type: "bandpass" # "bandpass", "highpass", "lowpass", "none"
+    low_cutoff: 0.05 # Hz
+    high_cutoff: 14.0 # Hz (below Nyquist for 30 Hz PMU)
+    order: 4
+  outlier_detection:
+    method: "mad" # "mad", "zscore", or "none"
+    threshold: 5.0 # Number of MADs or sigmas
+
+analysis:
+  fft:
+    zero_padding_factor: 2
+  welch:
+    nperseg: 256
+    noverlap: 128
+    window: "hann"
+  stft:
+    nperseg: 128
+    noverlap: 96
+    window: "hann"
+  cwt:
+    wavelet: "morl"
+    total_scales: 64
+  damping:
+    min_confidence: 0.60
+    well_damped_threshold: 0.05 # 5% damping ratio
+    undamped_threshold: 0.00
+  forced_oscillation:
+    persistence_ratio_threshold: 0.65
+    spectral_purity_threshold: 0.40
+    frequency_stability_tolerance: 0.05 # Hz variation
+  source_assessment:
+    coherence_threshold: 0.60
+    min_channels_required: 2

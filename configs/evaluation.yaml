@@ -1,0 +1,26 @@
+# Model Evaluation Configurations
+
+metrics:
+  classification:
+    - "accuracy"
+    - "precision_macro"
+    - "recall_macro"
+    - "f1_macro"
+    - "f1_weighted"
+    - "pr_auc_macro"
+    - "roc_auc_ovr"
+  calibration:
+    n_bins: 10
+    strategy: "uniform"
+  explainability:
+    sample_size: 50
+    methods:
+      - "feature_importance"
+      - "shap_tree"
+
+reporting:
+  output_dir: "reports"
+  export_formats:
+    - "json"
+    - "csv"
+    - "html"

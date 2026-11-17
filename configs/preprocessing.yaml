@@ -1,0 +1,30 @@
+# Preprocessing Configurations for Grid Disturbance Signals
+
+pipeline:
+  steps:
+    - name: "validate_sampling"
+      strict: true
+    - name: "handle_missing"
+      method: "linear_interpolate" # "linear_interpolate", "forward_fill", "drop"
+      max_gap_seconds: 1.0
+    - name: "detrend"
+      type: "linear"
+    - name: "remove_dc"
+      enabled: true
+    - name: "outliers"
+      method: "mad"
+      threshold: 6.0
+      action: "clip" # "clip", "interpolate", "flag"
+    - name: "filter"
+      type: "butterworth"
+      filter_mode: "bandpass"
+      low_cutoff: 0.1
+      high_cutoff: 12.0
+      order: 4
+    - name: "normalize"
+      method: "standardize"
+
+segmentation:
+  window_length_seconds: 20.0
+  overlap_ratio: 0.50
+  min_samples: 150
