@@ -7,27 +7,43 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
         with:
-          node-version: 20
+          python-version: ${{ matrix.python-version }}
 
-      # Uncomment and adjust the steps below to match your project's setup
+      - name: Install uv and dependencies
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          uv venv
+          uv pip install -e ".[dev]"
 
-      # - name: Install dependencies
-      #   run: npm ci
+      - name: Lint and format check with ruff
+        run: |
+          .venv/bin/ruff check src tests scripts examples
+          .venv/bin/ruff format --check src tests scripts examples
 
-      # - name: Lint
-      #   run: npm run lint
+      - name: Type check with mypy
+        run: |
+          .venv/bin/mypy src/grid_disturbance
 
-      # - name: Run tests
-      #   run: npm test
+      - name: Run test suite with pytest
+        env:
+          MPLCONFIGDIR: /tmp/matplotlib
+        run: |
+          .venv/bin/pytest --cov=grid_disturbance --cov-report=xml
 
-      # - name: Build
-      #   run: npm run build
+      - name: Validate CLI entrypoint
+        run: |
+          .venv/bin/grid-disturbance --help
+          .venv/bin/grid-disturbance data prepare --samples 10
+          .venv/bin/grid-disturbance data inspect
