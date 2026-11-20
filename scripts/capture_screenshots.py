@@ -10,6 +10,7 @@ SCREENSHOT_DIR.mkdir(parents=True, exist_ok=True)
 
 CHROME_PATH = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 
+
 async def capture_all():
     async with async_playwright() as p:
         browser = await p.chromium.launch(
@@ -65,6 +66,7 @@ async def capture_all():
 
         await browser.close()
         print("All screenshots captured successfully!")
+
 
 if __name__ == "__main__":
     asyncio.run(capture_all())
