@@ -141,6 +141,7 @@ class DisturbanceDiagnosticEngine:
             freq_report.is_frequency_instability
             and freq_report.max_frequency_deviation_hz > 0.25
             and not discrim.forced_evidence.is_forced
+            and discrim.primary_classification != "forced_oscillation"
         ):
             dist_type = "frequency_excursion"
             conf = 0.85

@@ -73,17 +73,21 @@ def analyze_forced_oscillation(
     total_windows = 0
 
     if len(arr) >= w_len and f0 > 0.05:
+        # Zero-pad FFT to obtain fine frequency resolution (< 0.05 Hz)
+        nfft = max(512, int(2 ** np.ceil(np.log2(w_len * 4))))
+        seg_freqs = np.fft.rfftfreq(nfft, d=1.0 / sampling_rate)
+        pos_mask = seg_freqs >= 0.05
+        tol = max(0.12, 1.5 * (sampling_rate / w_len))
+
         for start in range(0, len(arr) - w_len + 1, s_len):
             total_windows += 1
             seg = arr[start : start + w_len]
-            seg_fft = np.abs(np.fft.rfft(seg * signal.windows.hann(len(seg))))
-            seg_freqs = np.fft.rfftfreq(len(seg), d=1.0 / sampling_rate)
+            windowed = (seg - np.mean(seg)) * signal.windows.hann(len(seg))
+            seg_fft = np.abs(np.fft.rfft(windowed, n=nfft))
 
-            # Check if peak in window is within +/-0.08 Hz of overall dominant frequency
-            mask = (seg_freqs >= max(0.05, f0 - 0.08)) & (seg_freqs <= f0 + 0.08)
-            if np.sum(mask) > 0:
-                seg_dom = seg_freqs[np.argmax(seg_fft)]
-                if abs(seg_dom - f0) <= 0.08:
+            if np.sum(pos_mask) > 0 and np.max(seg_fft[pos_mask]) > 1e-6:
+                seg_dom = float(seg_freqs[pos_mask][np.argmax(seg_fft[pos_mask])])
+                if abs(seg_dom - f0) <= tol:
                     active_windows += 1
 
     persistence = (active_windows / total_windows) if total_windows > 0 else 0.0

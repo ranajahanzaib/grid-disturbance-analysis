@@ -158,13 +158,16 @@ def estimate_frequency_drift(
     if len(arr) < 2 * w_len:
         return 0.0
 
+    nfft = max(512, int(2 ** np.ceil(np.log2(w_len * 4))))
+    freqs = np.fft.rfftfreq(nfft, d=1.0 / sampling_rate)
+    # Search within 0.1 to 14 Hz
+    mask = (freqs >= 0.1) & (freqs <= 14.0)
+
     dom_freqs = []
     for start in range(0, len(arr) - w_len + 1, s_len):
         seg = arr[start : start + w_len]
-        fft_vals = np.abs(np.fft.rfft(seg * signal.windows.hann(len(seg))))
-        freqs = np.fft.rfftfreq(len(seg), d=1.0 / sampling_rate)
-        # Search within 0.1 to 14 Hz
-        mask = (freqs >= 0.1) & (freqs <= 14.0)
+        windowed = (seg - np.mean(seg)) * signal.windows.hann(len(seg))
+        fft_vals = np.abs(np.fft.rfft(windowed, n=nfft))
         if np.sum(mask) > 0 and np.max(fft_vals[mask]) > 1e-6:
             dom_freqs.append(float(freqs[mask][np.argmax(fft_vals[mask])]))
 

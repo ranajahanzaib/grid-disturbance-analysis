@@ -93,7 +93,12 @@ def analyze_frequency_instability(
     has_dc_excursion = (
         abs(settling_dev) >= 0.08
         or abs(drift_rate) >= 0.02
-        or (nadir is not None and nadir < nominal_frequency - 0.20 and abs(settling_dev) > 0.05)
+        or (
+            nadir is not None
+            and nadir < nominal_frequency - 0.20
+            and abs(settling_dev) > 0.05
+            and not has_osc
+        )
     )
 
     if (max_dev >= 0.50 or abs(max_rocof) >= 0.80) and has_dc_excursion:
