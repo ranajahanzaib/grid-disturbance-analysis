@@ -46,18 +46,29 @@ from grid_disturbance.synthetic.scenarios import (
 st.sidebar.title("⚡ Grid Disturbance")
 st.sidebar.caption("Power System Oscillation Analysis & Source Localization")
 
+nav_options = [
+    "1. Overview & Statistics",
+    "2. Signal Explorer",
+    "3. Signal Analysis",
+    "4. Disturbance Diagnosis",
+    "5. Event Comparison",
+    "6. Event Clustering",
+    "7. Model Laboratory",
+    "8. Analysis History",
+]
+
+# Support deep linking via URL query params (?nav=diagnosis, ?nav=3, etc.)
+query_nav = str(st.query_params.get("nav", "")).lower()
+default_idx = 0
+for idx, opt in enumerate(nav_options):
+    if query_nav and (query_nav in opt.lower() or query_nav == str(idx + 1)):
+        default_idx = idx
+        break
+
 section = st.sidebar.radio(
     "Navigation",
-    [
-        "1. Overview & Statistics",
-        "2. Signal Explorer",
-        "3. Signal Analysis",
-        "4. Disturbance Diagnosis",
-        "5. Event Comparison",
-        "6. Event Clustering",
-        "7. Model Laboratory",
-        "8. Analysis History",
-    ],
+    nav_options,
+    index=default_idx,
 )
 
 repo = AnalysisRepository()
